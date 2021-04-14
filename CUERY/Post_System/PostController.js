@@ -50,7 +50,7 @@ router.get('/posts', async (req, res) => {
     const limit = parseInt(req.query.limit);
     switch(req.query.sort) {
         case "timeAsc":
-            sort = "+createdAt";
+            sort = {"createdAt": "asc"};
             break;
         case "voteAsc":
             sort = {
