@@ -1,12 +1,14 @@
 /* for newpost.html, viewpost.html and main.html */
-body {line-height: 200%; background-color: #8cf; overflow-x: hidden;}
+body {line-height: 200%; background-color: #ede4f0; overflow-x: hidden;
+    font-family: 'Ubuntu', sans-serif;
+}
 div {height: 100%; margin: 0 auto;} /* margin: 0 auto is for centering */
 p {display: inline-block; margin: 0.2em;}
 a,input,select {line-height: 100%; margin-left: 0.5em;}
 
-button {border: 1px solid blue; border-radius: 0.5em; background-color: #def; transition: background 0.2s;}
+button {border: 1px solid white; border-radius: 0.5em; background-color: #def; transition: background 0.2s;}
 button:hover {background-color: #8cf;}
-button:active {background-color: #88f;}
+button:active {background-color: #8C55AA;}
 
 .logoutbutton{
     height: 20px;
@@ -26,7 +28,7 @@ button:active {background-color: #88f;}
     border: 1.5px solid yellowgreen;
     border-radius: 1em;
     padding-bottom: 2em
-}
+    }
                 
  .profilebutton{
     height: 20px;
@@ -79,14 +81,31 @@ button:active {background-color: #88f;}
 }
 
 /* for main.html */
-#posts {background-color: #cef; padding: 0.2em 0;}
-#posts>div {background-color: #adf; line-height: 100%; margin: 0.3em 0.5em; cursor: pointer;}
-#pages>p {display: inline; cursor: pointer;}
+#posts {background-color: #fff; padding: 0.2em 0;border-radius:10px;box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);}
+#posts>div {background-color: #cbf6ff; line-height: 100%; border-radius:10px;margin: 0.3em 0.5em; cursor: pointer;}
+#posts>div:hover:not(.active) {
+  background-color: #7dbaf6;
+  border-radius: 10px;
+}
+#pages>p {
+  color: black;
+  padding: 5px 15px;
+  text-decoration: none;
+}
 
+#pages>p.active {
+  background-color: #adf1b0;
+  color: white;
+  border-radius: 10px;
+}
+
+#pages>p:hover:not(.active) {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+}
 /* for newpost.html */
 #newcontent {line-height: 100%; height: 70vh; width: calc(100vw - 2em);background-color: #cef; resize: none;}
 
-/* for viewpost.html */
 .vote_button {
 	background-repeat: no-repeat;
 	background-position: center;
@@ -107,16 +126,18 @@ button:active {background-color: #88f;}
 	border: 0.25em solid #adf;
 	border-radius: 0.5em;
 	margin: 0 auto;
-    margin-bottom: 1em;
 	width: 700px;
 	padding: 0.5em;
 	overflow: auto;
 }
 #content {
-	margin-left: 3em;
-    margin-right: 2.5em;
+	margin-left: 50px;
+    padding-right: 1em;
+    padding-bottom: 0.5em;
 	overflow: auto;
-    word-break: break-word;
+    line-break: auto;
+    word-break: break-all;
+    line-height: 1.5em;
 }
 #vote {
 	float: left;
@@ -127,28 +148,14 @@ button:active {background-color: #88f;}
 	align-items: center;
 }
 #owner {
-	font-size: 10px;
-	line-height: 20px;
-}
-#tagbox {
-    margin: 0;
-    padding: 0;
-    line-height: 2em;
-}
-.tag {
-    display: inline;
-    background-color: rgb(46, 46, 46);
-    border-radius: 0.5em;
-    color: white;
-    font-size: 10px;
-    padding: 0.2em;
-    margin: 0;
+	font-size: 12px;
+	font-style: italic;
+	line-height: 15px;
 }
 #title {
 	font-size: 30px;
-    margin-bottom: 0.5em;
 	font-weight: bold;
-    word-break: break-word;
+    line-height: 65px;
 }
 #vote_count {
 	padding: 0px;
@@ -163,12 +170,12 @@ button:active {background-color: #88f;}
 }
 #comment_editor_textarea {
 	width: 700px;
-	margin: 0;
+	margin-top: 1em;
 	padding: 0.5em;
 	line-height: 1.5em;
 	background-color: rgb(196, 229, 252);
 	resize: none;
-	border: transparent;
+	border: 1px solid rgb(94, 119, 136);
 	border-radius: 5px;
 }
 #comments {
@@ -188,41 +195,4 @@ button:active {background-color: #88f;}
   height: 20rem;
   width: 20rem;
 }
-
-.updatediv {
-  text-align: center;  
-}
-
-.updatebutton{
-    height: 20px;
-    position: relative;
-    width: 40%;
-    border: 2px solid pink;
-    border-radius: 1em;
-    padding-bottom: 2em;
-    margin-bottom: 30px;
-}
-
-.updatesubmitbutton{
-    height: 20px;
-    position: relative;
-    width: 25%;
-    border: 2px solid brown;
-    border-radius: 1em;
-    padding-bottom: 2em;
-    margin-bottom: 30px;
-}
-
-.updatesubmitdiv{
-    text-align: center; 
-}
-
-div .reminder{
-    color: red;
-    font-size: 12px;
-    line-height: 70%;
-    margin-top: 0;
-    padding-bottom: 1.5em;
-}
-
 
