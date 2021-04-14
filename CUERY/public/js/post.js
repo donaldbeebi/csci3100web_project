@@ -127,7 +127,6 @@ function toTitleCase(str) {
 				},
 				body: JSON.stringify({data})
 			};
-			console.log(data._id);
 			fetch("/user/posts/"+data._id,{options2})
 			.then(res=>res.json())
 			.then(data=>{
