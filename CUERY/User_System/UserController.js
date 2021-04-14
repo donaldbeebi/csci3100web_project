@@ -91,7 +91,6 @@ function validateEmail(email) {
         }
          //const user = await User.login(email, password);//login_authentication
         const token = await user.Token();
-        console.log("Login Successfully.");
         let options = {
             path:"/",
             sameSite:true,
@@ -303,7 +302,6 @@ User.post('/update',authentication, upload.single('avatar'),async(req,res,next)=
             res.status(500); // bad request
             console.log(err);
         }
-        console.log("updated");
         res.redirect("user.html?success");
     })
 });
