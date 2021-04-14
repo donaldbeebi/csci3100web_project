@@ -159,6 +159,9 @@ function addCommentToList(data, indentation, depth) {
     //comment
     var comment = document.createElement("div");
     comment.setAttribute("id", "comment_content_" + data._id);
+    comment.style.lineHeight = "1.5em";
+    comment.style.paddingTop = "0.5em";
+    comment.style.paddingBottom = "0.5em";
     if(!data.deleted) comment.innerHTML = data.content;
     else comment.innerHTML = "<span style='color: rgb(73, 164, 233);'>[COMMENT DELETED BY USER]</span>";
     element.appendChild(comment);
