@@ -61,7 +61,6 @@ function validateEmail(email) {
     else{
         try{
             await newUser.save();//save user
-            console.log("Created");
             WelcomeEmail(req.body.newEmail, req.body.username);     //send welcome email
             //const token = await newUser.Token();        //generate a token for the saved user and send back both toke and user
             res.redirect('/redirection.html');
@@ -152,7 +151,6 @@ User.post("/forgot", [
 
        await user.ResetPassword();
        let link = "http://" + req.headers.host + "/reset/" + user.resetPasswordToken;
-       console.log(link);
        RecoveryEmail(user.email,user.name,link);
        res.status(200).send('Account activation email has been sent,please check your mailbox.');
     }
@@ -341,15 +339,12 @@ User.delete('/delete/:id',async(req,res)=>{
 
 User.post('/checkCookie', async (req, res)=>{
     try{
-        console.log(req.body.userCookie);
         const user = await UserModel.findOne({ 'tokens.token' : req.body.userCookie });
         if (!user) {
             //if error:not user be found
-            console.log("CANNOT FIND user with token");
             res.send({answer: 'NA'});
         }
         else{
-            console.log("have user logged in");
             res.send(user);
         }
     } catch(error){
