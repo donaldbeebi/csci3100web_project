@@ -22,7 +22,8 @@ app.use(UserRouter);
 app.use(PostRouter);
 app.use(CommentRouter);
 
+app.get("/",(req,res)=>res.redirect("/main.html"));
 
 app.listen(port,()=>{
     console.log('Server Starting!'+port);
-})
+});
