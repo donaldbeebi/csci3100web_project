@@ -17,6 +17,7 @@ const { post } = require('../User_System/UserSchema');
  * 4. Modify a comment of its content
  * 5. Cast a vote only once or cancel a vote
  * 6. Delete a comment
+ * 7. Find out if an an owner has already voted in a comment
  */
 
 //1. Retrieve a comment
@@ -209,7 +210,7 @@ router.delete('/comments/:id', authentication, async (req, res) => {
     }
 });
 
-//Find out if an an owner has already voted in a comment
+//7. Find out if an an owner has already voted in a comment
 router.get('/comments/findVoteOwner/:id', async (req, res) => {
     const owner = req.query.owner;
     try {

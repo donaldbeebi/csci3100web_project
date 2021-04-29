@@ -5,9 +5,11 @@ var username;
 var openedReplybox;
 
 //function definitions
+//upvoting a post/comment
 async function upvote(target) {
     var url;
 
+    //preparing the url
     if(target === "post") {
         url = "/posts/vote/" + postID;
     }
@@ -15,11 +17,13 @@ async function upvote(target) {
         url = "/comments/vote/" + target;
     }
 
+    //if no vote has been cast
     if(voteStatus[target] === "none") {
         document.getElementById("vote_count_" + target).innerHTML = (parseInt(document.getElementById("vote_count_" + target).innerHTML) + 1).toString();
         voteStatus[target] = "upvote";
         updateStatus(target);
 
+        //upvote
         await fetch(url, 
         {
             method:"PATCH", 
@@ -27,17 +31,20 @@ async function upvote(target) {
             body: JSON.stringify({action:"upvote", owner: username})
         });
     }
+    //if a downvote has been cast
     else if (voteStatus[target] === "downvote") {
         document.getElementById("vote_count_" + target).innerHTML = (parseInt(document.getElementById("vote_count_" + target).innerHTML) + 2).toString();
         voteStatus[target] = "upvote";
         updateStatus(target);
 
+        //cancel the current vote (which is upvote)
         await fetch(url, 
         {
             method:"PATCH", 
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({action:"cancel", owner: username})
         });
+        //upvote
         await fetch(url, 
         {
             method:"PATCH", 
@@ -45,11 +52,13 @@ async function upvote(target) {
             body: JSON.stringify({action:"upvote", owner: username})
         });
     }
+    //if an upvote has been caste
     else {
         document.getElementById("vote_count_" + target).innerHTML = (parseInt(document.getElementById("vote_count_" + target).innerHTML) - 1).toString();
         voteStatus[target] = "none";
         updateStatus(target);
         
+        //cancel the upvote (the user cancels its vote by clicking the lit up vote button, so clicking upvote while having already upvoted cancels the upvote)
         await fetch(url, 
             {
                 method:"PATCH", 
@@ -60,9 +69,11 @@ async function upvote(target) {
     }
 }
 
+//downvoting a post/comment
 async function downvote(target) {
     var url;
 
+    //preparing the url
     if(target === "post") {
         url = "/posts/vote/" + postID;
     }
@@ -70,11 +81,13 @@ async function downvote(target) {
         url = "/comments/vote/" + target;
     }
 
+    //if no vote has been cast
     if(voteStatus[target] === "none") {
         document.getElementById("vote_count_" + target).innerHTML = (parseInt(document.getElementById("vote_count_" + target).innerHTML) - 1).toString();
         voteStatus[target] = "downvote";
         updateStatus(target);
 
+        //downvote
         await fetch(url, 
         {
             method:"PATCH", 
@@ -82,17 +95,20 @@ async function downvote(target) {
             body: JSON.stringify({action:"downvote", owner: username})
         });
     }
+    //if an upvote has already been cast
     else if (voteStatus[target] === "upvote") {
         document.getElementById("vote_count_" + target).innerHTML = (parseInt(document.getElementById("vote_count_" + target).innerHTML) - 2).toString();
         voteStatus[target] = "downvote";
         updateStatus(target);
 
+        //cancel the upvote and
         await fetch(url, 
         {
             method:"PATCH", 
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({action:"cancel", owner: username})
         });
+        //downvote
         await fetch(url, 
         {
             method:"PATCH", 
@@ -100,11 +116,13 @@ async function downvote(target) {
             body: JSON.stringify({action:"downvote", owner: username})
         });
     }
+    //if a downvote has already been cast
     else {
         document.getElementById("vote_count_" + target).innerHTML = (parseInt(document.getElementById("vote_count_" + target).innerHTML) + 1).toString();
         voteStatus[target] = "none";
         updateStatus(target);
         
+        //cancel the downvote
         await fetch(url, 
             {
                 method:"PATCH", 
@@ -115,6 +133,7 @@ async function downvote(target) {
     }
 }
 
+//update the appearance of the vote arrow to reflect vote status
 function updateStatus(target) {
     switch(voteStatus[target]) {
         case "upvote":
@@ -134,8 +153,10 @@ function updateStatus(target) {
 
 //add one comment to list
 function addCommentToList(data, indentation, depth) {
+    //the depth variable tracks how nested a comment is
     if(!depth) depth = 1;
 
+    //preparing the UI elements
     var element;
     
     //element
@@ -253,7 +274,6 @@ function addCommentToList(data, indentation, depth) {
     replyTextarea.setAttribute("id", "reply_textarea_" + data._id);
     replyTextarea.setAttribute("rows", "2");
     replyTextarea.setAttribute("placeholder", "Write your comment here...");
-
     replyTextarea.style.padding = "0.5em";
     replyTextarea.style.lineHeight = "1.5em";
     replyTextarea.style.float = "bottom";
@@ -312,6 +332,7 @@ function addCommentToList(data, indentation, depth) {
     return element;
 }
 
+//create a new comment
 function createNewComment() {
     const comment = {
         owner: username,
@@ -342,6 +363,7 @@ function createNewComment() {
 	.catch(err => console.log(err));
 }
 
+//delete a post or comment
 function deletePostOrComment(target) {
     var url
     if(target === "post") {
@@ -366,11 +388,13 @@ function deletePostOrComment(target) {
     });
 }
 
+//display the comment reply box
 function displayReply(target) {
     const button = "display_reply_button_" + target;
     const replybox = "reply_box_" + target;
     const replyTextarea = "reply_textarea_" + target; 
 
+    //if the reply box is not displaying, display it
     if(document.getElementById(replybox).style.display === "none") {
         if(openedReplybox) displayReply(openedReplybox);
         document.getElementById(button).innerHTML = "close";
@@ -378,6 +402,7 @@ function displayReply(target) {
         document.getElementById(replyTextarea).focus();
         openedReplybox = target;
     }
+    //if the reply box is already displaying, close it
     else {
         document.getElementById(button).innerHTML = "reply";
         document.getElementById(replybox).style.display = "none";
@@ -385,6 +410,7 @@ function displayReply(target) {
     }
 }
 
+//send a request to reply to a comment
 function replyComment(target) {
     const content = document.getElementById("reply_textarea_" + target).value;
 
@@ -467,6 +493,7 @@ if(params.has("postid")) {
                 .then(data => {
                     if(data.length) {
                         document.getElementById("comments").innerHTML="";
+                        //populating the comment section
                         for(const comment of data) {
                             document.getElementById("comments").appendChild(addCommentToList(comment, 0));
                         };
