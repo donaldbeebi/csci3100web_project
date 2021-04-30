@@ -38,6 +38,7 @@ function getTimeElapsedString(timeStamp) {
     return  temp + " years ago";
 }
 
+// get the user's cookie
 function getCookie(cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
@@ -66,6 +67,7 @@ const options = {
         
 var user;
 // check the user's cookie before loading information
+// require the user to have cookie before viewing main pages
 function userAuthentication() {
 fetch('/checkCookie', options).then(res=>res.json())
 .then(data=>{
@@ -83,7 +85,8 @@ fetch('/checkCookie', options).then(res=>res.json())
         if (userUpdateName){
             userUpdateName.innerHTML = data.name;
         }
-
+        
+        // get the total number of posts by the user
         const options2 = {
 			method: 'GET',
 			headers: {
@@ -103,6 +106,7 @@ fetch('/checkCookie', options).then(res=>res.json())
 });
 }
 
+// also check user's cookies first
 function Post_profile() {
 	fetch('/checkCookie', options).then(res=>res.json())
 	.then(data=>{
@@ -128,6 +132,7 @@ function Post_profile() {
 	});
  }
 
+// a function used when user click the Log out button
 function Logout(){
     const option = {
     method: 'POST',
@@ -137,6 +142,7 @@ function Logout(){
     body: JSON.stringify({userCookie})
     };
     
+    // if successfully log out -> clear the cookie
     fetch('/logout', {method: 'POST'}).then(res=>res.json())
     .then(data=>{
         if (data.note === "success"){
@@ -149,10 +155,12 @@ function Logout(){
     });
 }
 
+// clicking the Profile button
 function toProfile(){
     window.location.href = "user.html";
 }
 
+// clicking the main button
 function toMain(){
     window.location.href = "main.html";
 }
@@ -160,7 +168,8 @@ function toMain(){
 function toPost(){
     window.location.href = "post-profile.html";
 }
-        
+
+// clicking the small avatar to toggle sidebar
 function toggleSidebar(){
     document.getElementById('sidebar').classList.toggle('sidebar-visible'); 
     document.getElementById('useravatar').classList.toggle('useravatar-visible');
@@ -206,15 +215,18 @@ function FetchHeader() { // fetch the page header for main.html, newpost.html an
 	.catch(err=>console.log("Unable to fetch header.\n",err));
 }
 
+// clicking the update info button in profile page
 function updateUser(){
     window.location.href = "userupdate.html";
 }
 
+// check update information when user try to click submit button in change profile page
 function checkUserUpdate(){
     let email = document.getElementById("email").value;
     let oldpw = document.getElementById("oldpw").value;
     let pw1 = document.getElementById("password").value;
     let pw2 = document.getElementById("newpw2").value;
+    // old password must be inputted by user
     if (oldpw.length === 0){
         alert("Old password is needed.");
         return false;

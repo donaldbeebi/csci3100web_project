@@ -10,6 +10,9 @@ const {WelcomeEmail, RecoveryEmail,ConfirmationEmail} = require('../User_System/
 const authentication=require('../User_System/method/authentication');
 const User = new express.Router(); 
 
+// const multer, storage, fileFilter, upload
+// are used to temperorily store the user's uploaded avatar
+// in the 'uploads' folder, used with the function /update
 const multer = require('multer');
 const path = require('path');
 
@@ -45,7 +48,8 @@ function validateEmail(email) {
 //2.Uer Login  
 //3.Uer Logout 
 //4.User Recovery (server side)
-  
+ 
+ // user registration
  User.post('/user_create', async(req, res)=> {
     const newUser = new UserModel({
         name: req.body.username,
@@ -53,18 +57,22 @@ function validateEmail(email) {
         password: req.body.newPassword,
         year: req.body.year,
     });
+    // setting a default avatar for the user
     newUser.avatar.data = fs.readFileSync("./CUERY/public/img/avatar.png");
     newUser.avatar.contentType = "image/png";
     
+    // check if the email is valid
     if (!validateEmail(req.body.newEmail))
         return res.redirect('/registration.html?invalid=2');
     else{
         try{
-            await newUser.save();//save user
-            WelcomeEmail(req.body.newEmail, req.body.username);     //send welcome email
-            //const token = await newUser.Token();        //generate a token for the saved user and send back both toke and user
+            await newUser.save();//save user to database
+            //send welcome email
+            WelcomeEmail(req.body.newEmail, req.body.username); 
+            // redirect to redirection page after success
             res.redirect('/redirection.html');
            //res.send({newUser,token});
+        // error when the username or email has already registered
         }catch(error){
           res.redirect('/registration.html?invalid=1');
           //res.send(error);
@@ -90,6 +98,7 @@ function validateEmail(email) {
           return res.redirect('/login.html?loginError=2');
         }
          //const user = await User.login(email, password);//login_authentication
+        // generate a token used as user cookie
         const token = await user.Token();
         let options = {
             path:"/",
@@ -109,7 +118,8 @@ function validateEmail(email) {
 //logout
 User.post('/logout',authentication, async(req,res)=>{
    try{
-     //remove token  when log out 
+     //remove token  when log out
+     // clear cookies in logout() in post.js
     req.user.tokens = [];
     await req.user.save();       //save user and send back information
     res.send({note: 'success'});
@@ -147,7 +157,7 @@ User.post("/forgot", [
             return res.status(401).send('The email address ' + email + 
             ' is not associated with any account. Double-check your email address and try again.');
          } 
-
+       // sending email with link to user
        await user.ResetPassword();
        let link = "http://" + req.headers.host + "/reset/" + user.resetPasswordToken;
        RecoveryEmail(user.email,user.name,link);
@@ -181,6 +191,7 @@ User.post('/reset/:token',[
   ],validator,
   async (req, res) => {
     try{
+        // find the user
         const user = await UserModel.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}});
         if (!user) {
             return res.status(401).send( 'Password reset token is invalid or has expired.');
@@ -189,7 +200,8 @@ User.post('/reset/:token',[
          user.password = req.body.password;         
          user.resetPasswordToken = undefined;
          user.resetPasswordExpires = undefined;
-
+         
+         // sending confirmation email if success
          await user.save();
          ConfirmationEmail(user.email,user.name);
          res.status(200).send('Your password has been updated.');
@@ -263,12 +275,15 @@ User.get('/user/comments/:id' , async(req,res)=>{
     }
 })
 
+// update user profile
 User.post('/update',authentication, upload.single('avatar'),async(req,res,next)=>{
     
+    // match the user password
     const isMatch = await bcrypt.compare(req.body.oldpw, req.user.password);
     if (!isMatch){
         return res.redirect("/userupdate.html?error=1")
     }
+    // check if the email is repeated
     if (req.body.email !== ""){
         const useremail = await UserModel.findOne({ email : req.body.email });
         if (useremail){
@@ -279,6 +294,7 @@ User.post('/update',authentication, upload.single('avatar'),async(req,res,next)=
         if (!validateEmail(req.body.email))
             return res.redirect('/userupdate.html?error=4');
     }
+    // only update the non-empty input
     const updateUser = {
         year: req.body.year
     };
@@ -297,6 +313,7 @@ User.post('/update',authentication, upload.single('avatar'),async(req,res,next)=
             contentType: req.file.mimetype
         }
     }
+    // updating database
     await UserModel.updateOne({name: req.user.name}, {$set: updateUser}, (err, result) =>{
         if (err){
             res.status(500); // bad request
@@ -335,6 +352,8 @@ User.delete('/delete/:id',async(req,res)=>{
 
 })
 
+// check user's cookies whenever user access main.html and other pages
+// if there is a cookie, allow access
 User.post('/checkCookie', async (req, res)=>{
     try{
         const user = await UserModel.findOne({ 'tokens.token' : req.body.userCookie });
