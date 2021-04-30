@@ -18,6 +18,8 @@ const router = new express.Router();
  * 5. Modify a post of its title, content, category, topic, and status
  * 6. Cast a vote only once or cancel a vote
  * 7. Delete a post
+ * 8. Get the list of all possible topics
+ * 9. Find if a user has already voted a post
  */
 
 //1. Read a post
@@ -219,9 +221,11 @@ router.patch('/posts/vote/:id',authentication, async (req, res) => {
         //cancelling a vote
         if(action === "cancel") {
             if(post.upvoteOwners.includes(owner) || post.downvoteOwners.includes(owner)) {
+                //the owner has cast a vote already
                 //checking if the voter has an upvote or not
                 const isUpvote = post.upvoteOwners.includes(owner);
                 if(isUpvote) {
+                    //cancelling the upvote
                     try {
                         post.upvoteOwners.splice(post.upvoteOwners.indexOf(owner), 1);
                         post.upvotes -= 1;
@@ -232,6 +236,7 @@ router.patch('/posts/vote/:id',authentication, async (req, res) => {
                     } 
                 }
                 else {
+                    //cancelling the downvote
                     try {
                         post.downvoteOwners.splice(post.downvoteOwners.indexOf(owner), 1);
                         post.downvotes -= 1;
@@ -242,9 +247,10 @@ router.patch('/posts/vote/:id',authentication, async (req, res) => {
                     } 
                 }
             }
+            //the owner has not cast a vote, and the cancel operation is not valid
             return res.status(404).send({ error: "No owner found." });
         }
-        //voting
+        //the owner has not cast a vote, voting
         else if(action === "upvote" || action === "downvote") {
             //checking if the owner has already voted
             const alreadyVoted = post.upvoteOwners.includes(owner) || post.downvoteOwners.includes(owner);
@@ -300,7 +306,7 @@ router.delete('/posts/:id', authentication, async (req, res) => {
     }
 });
 
-//get lists
+//8. Get the list of all possible topics
 router.get('/lists/:list', async (req, res) => {
     switch(req.params.list) {
         case "status":
@@ -314,7 +320,7 @@ router.get('/lists/:list', async (req, res) => {
     }
 });
 
-//find owner
+//9. Find if a user has already voted a post
 router.get('/posts/findVoteOwner/:id', async (req, res) => {
     const owner = req.query.owner;
     try {

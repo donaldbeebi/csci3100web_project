@@ -33,15 +33,17 @@ router.get('/comments/:id', authentication, async (req, res) => {
     }
 });
 
-//2. Retrieve all children comments by a parent ID
+//2. Retrieve all children comments by a parent ID (the parent ID could be a parent post or a parent comment)
 router.get('/comments/children/:id', authentication, async (req, res) => {
     try {
         const parentPost = await PostModel.findById(req.params.id);
         if(parentPost) {
+            //if the parent ID belongs to a post
             const comments = await CommentModel.find({ parentComment: "", parentPost: req.params.id });
             return res.send(comments);
         }
         else {
+            //if the parent ID belongs to a comment
             const parentComment = await CommentModel.findById(req.params.id);
             if(parentComment) {
                 const comments = await CommentModel.find({ parentComment: req.params.id });
@@ -127,10 +129,12 @@ router.patch('/comments/:id', authentication, async (req, res) => {
         //cancelling a vote
         if(action === "cancel") {
             if(comment.upvoteOwners.includes(owner) || comment.downvoteOwners.includes(owner)) {
+                //the owner has cast a vote
                 //checking if the voter has an upvote or not
                 const isUpvote = comment.upvoteOwners.includes(owner);
                 if(isUpvote) {
                     try {
+                        //removing the owner's name from the list of upvote owners
                         comment.upvoteOwners.splice(comment.upvoteOwners.indexOf(owner), 1);
                         comment.upvotes -= 1;
                         await comment.save();
@@ -141,6 +145,7 @@ router.patch('/comments/:id', authentication, async (req, res) => {
                 }
                 else {
                     try {
+                        //removing the owner's name from the list of downvote owners
                         comment.downvoteOwners.splice(comment.upvoteOwners.indexOf(owner), 1);
                         comment.downvotes -= 1;
                         await comment.save();
@@ -150,6 +155,7 @@ router.patch('/comments/:id', authentication, async (req, res) => {
                     } 
                 }
             }
+            //the owner has not cast a vote yet, the cancel operation is invalid (not supposed to happen)
             return res.status(404).send({ error: "No owner found." });
         }
         //voting
